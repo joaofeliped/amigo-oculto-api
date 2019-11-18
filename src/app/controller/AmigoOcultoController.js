@@ -41,12 +41,12 @@ class AmigoOcultoController {
       });
     }
 
-    if (isAfter(dataAmigoOculto, setDayOfYear(dataSorteioAmigoOculto, 7))) {
-      return res.status(400).json({
-        error:
-          'A data do Amigo oculto tem que ser pelo menos uma semana após a data do sorteio.',
-      });
-    }
+    // if (isAfter(dataAmigoOculto, setDayOfYear(dataSorteioAmigoOculto, 7))) {
+    //   return res.status(400).json({
+    //     error:
+    //       'A data do Amigo oculto tem que ser pelo menos uma semana após a data do sorteio.',
+    //   });
+    // }
 
     const amigoOculto = await AmigoOculto.create({
       nome,
