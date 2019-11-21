@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this */
-import { parseISO, isBefore, isAfter, setDayOfYear } from 'date-fns';
+import { parseISO, isBefore, addDays } from 'date-fns';
+import * as Yup from 'yup';
 import AmigoOculto from '../model/AmigoOculto';
 
 class AmigoOcultoController {
@@ -22,6 +23,19 @@ class AmigoOcultoController {
   }
 
   async store(req, res) {
+    const schema = Yup.object().shape({
+      nome: Yup.string().required(),
+      data: Yup.date().required(),
+      data_sorteio: Yup.date().required(),
+      observacao: Yup.string(),
+      valor_minimo: Yup.number(),
+      valor_maximo: Yup.number(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'A validação falhou.' });
+    }
+
     const {
       nome,
       data,
@@ -41,12 +55,12 @@ class AmigoOcultoController {
       });
     }
 
-    // if (isAfter(dataAmigoOculto, setDayOfYear(dataSorteioAmigoOculto, 7))) {
-    //   return res.status(400).json({
-    //     error:
-    //       'A data do Amigo oculto tem que ser pelo menos uma semana após a data do sorteio.',
-    //   });
-    // }
+    if (isBefore(dataAmigoOculto, addDays(dataSorteioAmigoOculto, 7))) {
+      return res.status(400).json({
+        error:
+          'A data do Amigo oculto tem que ser pelo menos uma semana após a data do sorteio.',
+      });
+    }
 
     const amigoOculto = await AmigoOculto.create({
       nome,
@@ -66,7 +80,7 @@ class AmigoOcultoController {
         const aoe = await AmigoOculto.findByIdAndUpdate(
           id,
           { $set: req.body },
-          function(err, result) {
+          function(err) {
             if (err) {
               console.log(err);
             }
@@ -84,7 +98,7 @@ class AmigoOcultoController {
   async delete(req, res) {
     const { id } = req.params;
 
-    await AmigoOculto.findByIdAndDelete(id, function(err, result) {
+    await AmigoOculto.findByIdAndDelete(id, function(err) {
       if (err) {
         res.status(400).json('Não foi encontrado o registro para remover.');
       }
