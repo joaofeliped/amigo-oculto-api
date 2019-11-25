@@ -20,6 +20,28 @@ class UserController {
 
     return res.json(user);
   }
+
+  async index(req, res) {
+    const { page = 1, limit = 20 } = req.query;
+
+    const users = await User.find()
+      .limit(parseInt(limit))
+      .skip((page - 1) * limit);
+
+    return res.json(users);
+  }
+
+  async delete(req, res) {
+    const { id } = req.params;
+
+    const checkUser = await User.findById(id);
+
+    // if (!checkUser) {
+    //   return res.status(404).json({ message: 'User not found' });
+    // }
+
+    return res.json({ msg: 'teste' });
+  }
 }
 
 export default new UserController();
